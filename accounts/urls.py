@@ -1,13 +1,19 @@
 from django.urls import path
-from .views import index, contact, jobs, candidate, job_details, blog
-
+from accounts.views import RegistrationAPIView, LoginAPIView, LogoutAPIView, GetUserAPIView
 
 urlpatterns = [
-     path('', index, name='index'),
-     path('contact/', contact, name='contact'),
-     path('jobs/', jobs, name='jobs'),
-     path('candidate/', candidate, name='candidate'),
-     path('job_details/', job_details, name='job_details'),
-     path('blog/', blog, name='blog'),
-
+    path('register/', RegistrationAPIView.as_view()),
+    path('login/', LoginAPIView.as_view()),
+    path('logout/', LogoutAPIView.as_view()),
+    path('get_user/', GetUserAPIView.as_view()),
+    
 ]
+
+# {
+#   "username": "Ulanka00",
+#   "email": "user0001@example.com",
+#   "password": "qwertyuiopsds",
+#   "first_name": "ulan11",
+#   "last_name": "Azimov11",
+# }
+

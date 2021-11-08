@@ -40,6 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_countries',
     'ckeditor',
+    'rest_framework',
+    # 'django_rest_passwordreset',
+    'drf_yasg',
+    'rest_framework.authtoken',
 
     #apps
     'accounts',
@@ -146,4 +150,32 @@ CKEDITOR_CONFIGS = {
     },
 }
 
+AUTH_USER_MODEL = 'accounts.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
+
+SWAGGER_SETTINGS = {
+    'PERSIT_AUTH': True,
+    'SECURITY_DEFINITIONS':{
+        'Basic':{
+            'type': 'basic'
+        },
+        'Token': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    }
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "azimovu55@gmail.com"
+EMAIL_HOST_PASSWORD = 'Alinaka2'
 

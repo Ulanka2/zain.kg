@@ -2,8 +2,11 @@ django
 pillow
 django-countries
 django-ckeditor==5.9.0
-
 djangorestframework
 drf-yasg 
 psycopg2
 django-rest-auth
+django-3-jet
+django-rest-passwordreset
+docx-0.2.4 
+lxml-4.6.4

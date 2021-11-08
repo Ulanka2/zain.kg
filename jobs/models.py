@@ -23,7 +23,7 @@ class Category(models.Model):
 
 
 class Job(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='jobs', verbose_name='Категория')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='jobs',verbose_name='Категория')
     name = models.CharField(max_length=200, verbose_name='Название вакансии')
     slug = models.SlugField(max_length=200, unique=True)
     country = CountryField(blank_label='(select country)')
@@ -33,7 +33,6 @@ class Job(models.Model):
     body =  RichTextField(null=True, blank=True)
     work_time = models.CharField(max_length=55, null=True, blank=True)
     responsibility = models.TextField(null=True, blank=True, verbose_name='Обязанность')
-    qualifications = models.CharField(max_length=255, null=True, blank=True, verbose_name='Квалификация')
     job_title = models.CharField(max_length=55, null=True, blank=True, verbose_name='Должность')
     salary = models.CharField(max_length=55, null=True, blank=True)
     benefits = models.TextField(null=True, blank=True)
@@ -58,9 +57,9 @@ class Job(models.Model):
 
 
 class Application(models.Model):
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, null=True, blank=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True) 
-    full_name = models.CharField('ФИО', max_length=255)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    full_name = models.CharField(max_length=255)
     email = models.EmailField(null=True, blank=True)
     phone = models.CharField(max_length=55, null=True, blank=True)
     upload_cv = models.FileField(upload_to='media_rezume')
@@ -78,14 +77,13 @@ class Application(models.Model):
         return f'Заявка от {self.user}, {self.full_name}'
 
 
-
-
 class Review(models.Model):
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='reviews')
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    name = models.CharField(max_length=255, null=True, blank=True)
     comment = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'Отзыв'

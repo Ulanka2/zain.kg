@@ -16,25 +16,25 @@ class Personal_Data(models.Model):
 
 
 class Language(models.Model):
-    LANGUAGE = (
-        ('E', 'English'),
-        ('R', 'Russian'),
-        ('T', 'Turkish'),
-        ('A', 'Arabic'),
-        ('C', 'Chinese'),
-    )
-    language = models.CharField(max_length=10, choices=LANGUAGE)
+    # LANGUAGE = (
+    #     ('E', 'English'),
+    #     ('R', 'Russian'),
+    #     ('T', 'Turkish'),
+    #     ('A', 'Arabic'),
+    #     ('C', 'Chinese'),
+    # )
+    language = models.CharField(max_length=10)
     
-    LAVEL = (
-        ('1', '1'),
-        ('2', '2'),
-        ('3', '3'),
-        ('4', '4'),
-        ('5', '5'),
-    )
-    written = models.CharField(max_length=1, choices=LAVEL)
-    spoken = models.CharField(max_length=1, choices=LAVEL)
-    understanding = models.CharField(max_length=1, choices=LAVEL)
+    # LEVEL = (
+    #     ('1', '1'),
+    #     ('2', '2'),
+    #     ('3', '3'),
+    #     ('4', '4'),
+    #     ('5', '5'),
+    # )
+    written = models.CharField(max_length=1)
+    spoken = models.CharField(max_length=1)
+    understanding = models.CharField(max_length=1)
 
 
 class Education(models.Model):
