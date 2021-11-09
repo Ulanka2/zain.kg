@@ -23,7 +23,7 @@ class Category(models.Model):
 
 
 class Job(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='jobs',verbose_name='Категория')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='jobs', verbose_name='Категория')
     name = models.CharField(max_length=200, verbose_name='Название вакансии')
     slug = models.SlugField(max_length=200, unique=True)
     country = CountryField(blank_label='(select country)')
@@ -39,7 +39,7 @@ class Job(models.Model):
     site = models.URLField(null=True, blank=True, verbose_name='Сайт компании')
     email = models.EmailField(null=True, blank=True)
     phone = models.CharField(max_length=55, null=True, blank=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
@@ -65,7 +65,7 @@ class Application(models.Model):
     upload_cv = models.FileField(upload_to='media_rezume')
     coverletter = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_watch = models.BooleanField(default=False)
 
     class Meta:

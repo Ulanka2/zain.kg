@@ -1,6 +1,5 @@
 from django.db import models
 
-
 class Personal_Data(models.Model):
     image = models.ImageField(upload_to='media_rezume')#3/4
     position_applied_for = models.CharField(max_length=55)
@@ -13,31 +12,35 @@ class Personal_Data(models.Model):
     status_children = models.CharField(max_length=30)
     health_smoker = models.CharField(max_length=30)
     image_full_height = models.ImageField(upload_to='media_rezume')#6/4 в полный рост
+    file = models.FileField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Language(models.Model):
-    # LANGUAGE = (
-    #     ('E', 'English'),
-    #     ('R', 'Russian'),
-    #     ('T', 'Turkish'),
-    #     ('A', 'Arabic'),
-    #     ('C', 'Chinese'),
-    # )
-    language = models.CharField(max_length=10)
+    personal_data = models.ForeignKey(Personal_Data, on_delete=models.CASCADE)
+    LANGUAGE = (
+        ('E', 'English'),
+        ('R', 'Russian'),
+        ('T', 'Turkish'),
+        ('A', 'Arabic'),
+        ('C', 'Chinese'),
+    )
+    language = models.CharField(max_length=10, choices=LANGUAGE)
     
-    # LEVEL = (
-    #     ('1', '1'),
-    #     ('2', '2'),
-    #     ('3', '3'),
-    #     ('4', '4'),
-    #     ('5', '5'),
-    # )
-    written = models.CharField(max_length=1)
-    spoken = models.CharField(max_length=1)
-    understanding = models.CharField(max_length=1)
+    LAVEL = (
+        ('1', '1'),
+        ('2', '2'),
+        ('3', '3'),
+        ('4', '4'),
+        ('5', '5'),
+    )
+    written = models.CharField(max_length=1, choices=LAVEL)
+    spoken = models.CharField(max_length=1, choices=LAVEL)
+    understanding = models.CharField(max_length=1, choices=LAVEL)
 
 
 class Education(models.Model):
+    personal_data = models.ForeignKey(Personal_Data, on_delete=models.CASCADE)
     university = models.CharField(max_length=100)
     specialization = models.CharField(max_length=100)
     duration =  models.CharField(max_length=10)
@@ -45,14 +48,14 @@ class Education(models.Model):
    
 
 class Work_Experience(models.Model):
+    personal_data = models.ForeignKey(Personal_Data, on_delete=models.CASCADE)
     position = models.CharField(max_length=30)
     company_name = models.CharField(max_length=55)
     period_city_country = models.CharField(max_length=55)
     responsibilities = models.TextField()
 
-
 class Skills(models.Model):
-    
+    personal_data = models.OneToOneField(Personal_Data, on_delete=models.CASCADE)
     other_professional_achievements_skills = models.TextField()
     
     I_AM_WILLING_TO_WORK = (

@@ -30,6 +30,8 @@ class Personal_DataAPIView(APIView):
                 health_smoker = serializer.validated_data.get('health_smoker'),
                 image_full_height = serializer.validated_data.get('image_full_height'))
             
+            
+        
             serializer = Personal_DataSerializer(instance=personal_Data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
@@ -100,11 +102,7 @@ class LanguageAPIView(APIView):
 
     
     
-    
-    
-    
-    
-    
+
     # @swagger_auto_schema(operations_description='Upload thumbnail',
     # request_body=LanguageSerializer, methods=['post'])
     # @api_view(['POST'])
