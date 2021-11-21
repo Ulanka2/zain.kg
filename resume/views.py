@@ -2,61 +2,268 @@ from django.shortcuts import render
 from rest_framework.views  import  APIView
 from rest_framework.response import Response
 from rest_framework import status
-from resume.models import  Personal_Data, Language
-from resume.serializers import  Personal_DataSerializer, LanguageSerializer
-from drf_yasg.utils import swagger_auto_schema
+from resume.models import  PersonalData, Language, Education, WorkExperience, Skills
+from resume.serializers import  PersonalDataSerializer, LanguageSerializer
+from resume.serializers import EducationSerializer, WorkExperienceSerializer, SkillsSerializer
 from rest_framework.decorators import api_view
-from rest_framework.viewsets import ModelViewSet
-from rest_framework import exceptions
+from rest_framework.generics import get_object_or_404
 from django.conf import settings
+from docx import Document
+from docx.shared import Inches
+import os
 
 
-class Personal_DataAPIView(APIView):
-    
-    def post(self, request):
-        serializer = Personal_DataSerializer(data=request.data )
+class PersonalDataAPIView(APIView):
+
+    def post(self, request, format=None):
+        serializer = PersonalDataSerializer(data=request.data)
         if serializer.is_valid():
+            instance = serializer.save()
+            doc = Document('media/example.docx')
+            tbl = doc.tables[0]
+            cell = tbl.rows[0].cells[0]
+            paragraph = cell.paragraphs[0]
+            run = paragraph.add_run()
+            run.add_picture(instance.image, height=Inches(1.90), width=Inches(1.80))
             
-            personal_Data = Personal_Data.objects.create(
-                image = serializer.validated_data.get('image'),
-                position_applied_for = serializer.validated_data.get('position_applied_for'),
-                num_passport_expire = serializer.validated_data.get('num_passport_expire'),
-                full_name = serializer.validated_data.get('full_name'),
-                nationality_gender = serializer.validated_data.get('nationality_gender'),
-                country_city_of_residence = serializer.validated_data.get('country_city_of_residence'),
-                date_and_place_of_birth = serializer.validated_data.get('date_and_place_of_birth'),
-                age_height_weight = serializer.validated_data.get('age_height_weight'),
-                status_children = serializer.validated_data.get('status_children'),
-                health_smoker = serializer.validated_data.get('health_smoker'),
-                image_full_height = serializer.validated_data.get('image_full_height'))
+            table = doc.tables[1]
+            hdr_cells = table.rows[0].cells
+            hdr_cells[1].text = instance.position_applied_for
+            hdr_cells = table.rows[1].cells
+            hdr_cells[1].text = instance.num_passport_expire
             
-            
-        
-            serializer = Personal_DataSerializer(instance=personal_Data)
+            table = doc.tables[2]
+            hdr_cells = table.rows[1].cells
+            hdr_cells[1].text = instance.full_name
+            hdr_cells = table.rows[2].cells
+            hdr_cells[1].text = instance.nationality_gender
+            hdr_cells = table.rows[3].cells
+            hdr_cells[1].text = instance.country_city_of_residence
+            hdr_cells = table.rows[4].cells
+            hdr_cells[1].text = instance.date_and_place_of_birth
+            hdr_cells = table.rows[5].cells
+            hdr_cells[1].text = instance.age_height_weight
+            hdr_cells = table.rows[6].cells
+            hdr_cells[1].text = instance.status_children
+            hdr_cells = table.rows[7].cells
+            hdr_cells[1].text = instance.health_smoker
+            doc.add_picture(instance.image_full_height, width=Inches(5))
+            name = instance.full_name.replace(' ', '')
+            doc_name = f'media/media_rezume/{name}-{instance.id}.docx'
+            doc.save(doc_name)
+            instance.file = os.path.join(settings.BASE_DIR, doc_name)
+            instance.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LanguageAPIView(APIView):
 
-    def post(self, request):
-        serializer = LanguageSerializer(data=request.data )
+    def post(self, request, id):
+        personal_data = get_object_or_404(PersonalData, id=id)
+        serializer = LanguageSerializer(data=request.data)
         if serializer.is_valid():
+            if personal_data.language_set.all().order_by('-id').count() >= 4:
+                return Response({'error: You have too many languages'}, status=status.HTTP_400_BAD_REQUEST)
             
-            language = Language.objects.create(
-                
-                language = serializer.validated_data.get('language'),
-                written = serializer.validated_data.get('written'),
-                spoken  = serializer.validated_data.get('spoken'),
-                understanding  = serializer.validated_data.get('understanding'))
+            instance = serializer.save(personal_data=personal_data)
+            name = personal_data.full_name.replace(' ', '')
+            doc = Document(f'media/media_rezume/{name}-{personal_data.id}.docx')
+            table = doc.tables[3]
+            personal_data = instance.personal_data
+            languages = personal_data.language_set.all()[:4]
+            basic_number = 2
+            for instance in languages:
+                hdr_cells = table.rows[basic_number].cells
+                hdr_cells[0].text = instance.language.name
+                table = doc.tables[3]
+                hdr_cells = table.rows[basic_number].cells
+                hdr_cells[int(instance.written) -1].text = instance.written
+                hdr_cells[int(instance.spoken) +3].text = instance.spoken
+                hdr_cells[int(instance.understanding) +7].text = instance.understanding
+                basic_number += 1
+            name = personal_data.full_name.replace(' ', '')
+            doc_name = f'media/media_rezume/{name}-{personal_data.id}.docx'
+            doc.save(doc_name)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+class EducationAPIView(APIView):
+
+    def post(self, request, id):
+        personal_data = get_object_or_404(PersonalData, id=id)
+        serializer = EducationSerializer(data=request.data)
+        if serializer.is_valid():
+            if personal_data.education_set.all().order_by('-id').count() >= 3:
+                return Response({'error: You have too many education'}, status=status.HTTP_400_BAD_REQUEST)
+            instance = serializer.save(personal_data=personal_data)
+            name = personal_data.full_name.replace(' ', '')
+            doc = Document(f'media/media_rezume/{name}-{personal_data.id}.docx')
             
-            serializer = Personal_DataSerializer(instance=language)
+            table = doc.tables[4]
+            personal_data = instance.personal_data
+            education = personal_data.education_set.all()[:3]
+            basic_number = 2
+            for instance in education:
+                hdr_cells = table.rows[basic_number].cells
+                hdr_cells[0].text = instance.university
+                hdr_cells = table.rows[basic_number].cells
+                hdr_cells[1].text = instance.specialization
+                hdr_cells = table.rows[basic_number].cells
+                hdr_cells[2].text = instance.duration
+                hdr_cells = table.rows[basic_number].cells
+                hdr_cells[3].text = instance.year_of_graduation_city_country
+                basic_number += 1 
+            name = personal_data.full_name.replace(' ', '')
+            doc_name = f'media/media_rezume/{name}-{personal_data.id}.docx'
+            doc.save(doc_name)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class WorkExperienceOneAPIView(APIView):
+
+    def post(self, request, id):
+        personal_data = get_object_or_404(PersonalData, id=id)
+        serializer = WorkExperienceSerializer(data=request.data)
+        if serializer.is_valid():
+            instance = serializer.save(personal_data=personal_data)
+            name = personal_data.full_name.replace(' ', '')
+            doc = Document(f'media/media_rezume/{name}-{personal_data.id}.docx')
+            table = doc.tables[5]
+            hdr_cells = table.rows[1].cells
+            hdr_cells[1].text = instance.position
+            hdr_cells = table.rows[2].cells
+            hdr_cells[1].text = instance.company_name
+            hdr_cells = table.rows[3].cells
+            hdr_cells[1].text = instance.period_city_country
+            hdr_cells = table.rows[4].cells
+            hdr_cells[1].text = instance.responsibilities
+            name = personal_data.full_name.replace(' ', '')
+            doc_name = f'media/media_rezume/{name}-{personal_data.id}.docx'
+            doc.save(doc_name)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class WorkExperienceTwoAPIView(APIView):
+
+    def post(self, request, id):
+        personal_data = get_object_or_404(PersonalData, id=id)
+        serializer = WorkExperienceSerializer(data=request.data)
+        if serializer.is_valid():
+            instance = serializer.save(personal_data=personal_data)
+            name = personal_data.full_name.replace(' ', '')
+            doc = Document(f'media/media_rezume/{name}-{personal_data.id}.docx')
+            table = doc.tables[5]
+            hdr_cells = table.rows[6].cells
+            hdr_cells[1].text = instance.position
+            hdr_cells = table.rows[7].cells
+            hdr_cells[1].text = instance.company_name
+            hdr_cells = table.rows[8].cells
+            hdr_cells[1].text = instance.period_city_country
+            hdr_cells = table.rows[9].cells
+            hdr_cells[1].text = instance.responsibilities
+            name = personal_data.full_name.replace(' ', '')
+            doc_name = f'media/media_rezume/{name}-{personal_data.id}.docx'
+            doc.save(doc_name)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class WorkExperienceThreeAPIView(APIView):
+
+    def post(self, request, id):
+        personal_data = get_object_or_404(PersonalData, id=id)
+        serializer = WorkExperienceSerializer(data=request.data)
+        if serializer.is_valid():
+            instance = serializer.save(personal_data=personal_data)
+            name = personal_data.full_name.replace(' ', '')
+            doc = Document(f'media/media_rezume/{name}-{personal_data.id}.docx')
+            table = doc.tables[5]
+            hdr_cells = table.rows[11].cells
+            hdr_cells[1].text = instance.position
+            hdr_cells = table.rows[12].cells
+            hdr_cells[1].text = instance.company_name
+            hdr_cells = table.rows[13].cells
+            hdr_cells[1].text = instance.period_city_country
+            hdr_cells = table.rows[14].cells
+            hdr_cells[1].text = instance.responsibilities
+            name = personal_data.full_name.replace(' ', '')
+            doc_name = f'media/media_rezume/{name}-{personal_data.id}.docx'
+            doc.save(doc_name)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SkillsAPIView(APIView):
+
+    def post(self, request, id):
+        personal_data = get_object_or_404(PersonalData, id=id)
+        serializer = SkillsSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            instance = serializer.save(personal_data=personal_data)
+            name = personal_data.full_name.replace(' ', '')
+            doc = Document(f'media/media_rezume/{name}-{personal_data.id}.docx')
+            table = doc.tables[6]
+            hdr_cells = table.rows[1].cells
+            hdr_cells[0].text = instance.other_professional_achievements_skills
+            
+            table = doc.tables[7]
+            if instance.work_time  == 'Less than 40 hours/week':
+                hdr_cells = table.rows[1].cells
+            elif instance.work_time  == '40–50 hours/week':
+                hdr_cells = table.rows[2].cells
+            else:
+                hdr_cells = table.rows[3].cells
+            hdr_cells[2].text = 'True'
+
+            table = doc.tables[8]
+            hdr_cells = table.rows[0].cells
+            hdr_cells[1].text = instance.i_confirm_that_the_information_of_application_form_is_true
+            name = personal_data.full_name.replace(' ', '')
+            doc_name = f'media/media_rezume/{name}-{personal_data.id}.docx'
+            doc.save(doc_name)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
 
+
+# @api_view(['POST'])
+# def languges_clear(self, request, *args, **kwargs):
+#         languge = request.personal_data.language_set.all()
+#         languge.language_set.clear()
+#         serializer = LanguageSerializer(instance=languge)
+#         return Response(serializer.data)
+#  for i in range(1, 4):
+#                 table = doc.tables[5]
+#                 personal_data = instance.personal_data
+                
+#                 # basic_numbe = 1
+            
+#                 hdr_cells = table.rows[i].cells
+#                 hdr_cells[1].text = workexperience[i-1].position
+#                 hdr_cells = table.rows[i+1].cells
+#                 hdr_cells[1].text = workexperience[i-1].company_name
+#                 hdr_cells = table.rows[i+2].cells
+#                 hdr_cells[1].text = workexperience[i-1].period_city_country
+#                 hdr_cells = table.rows[i+3].cells
+#                 hdr_cells[1].text = workexperience[i-1].responsibilities
+#                 # basic_numbe += 1
+
+# hdr_cells[8].text=''
+# table = doc.tables[3]
+# hdr_cells = table.rows[2].cells
+
+#  for row in table.rows:
+#                 string = ''
+#                 for cell in row.cells:
+#                     string = string + cell.text + ' '
+#                 print(string)
 
 # from docx import Document
 # from django.http import HttpResponse
@@ -98,24 +305,3 @@ class LanguageAPIView(APIView):
 #     response['Content-Disposition'] = 'attachment; filename=' + docx_title
 #     response['Content-Length'] = length
 #     return response
-
-
-    
-    
-
-    # @swagger_auto_schema(operations_description='Upload thumbnail',
-    # request_body=LanguageSerializer, methods=['post'])
-    # @api_view(['POST'])
-    # def post(self, request):
-    #     serializer =  LanguageSerializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     language = serializer.validated_data.get('language')
-    #     written = serializer.validated_data.get('written')
-    #     spoken  = serializer.validated_data.get('spoken')
-    #     understanding  = serializer.validated_data.get('understanding')
-       
-    
-    #     languags = Language.objects.create(language=language, written=written, spoken=spoken,
-    #                                     understanding=understanding)
-    #     return Response({'message': 'true'})
-

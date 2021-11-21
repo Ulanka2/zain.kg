@@ -49,8 +49,8 @@ class LoginAPIView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        username =serializer.validated_data.get('username')
-        password =serializer.validated_data.get('password')
+        username = serializer.validated_data.get('username')
+        password = serializer.validated_data.get('password')
         user = authenticate(username=username, password=password)
 
         if user is not None:
@@ -77,7 +77,6 @@ class GetUserAPIView(APIView):
         user = request.user
         serializers = UserSerializer(user, many=False)
         return Response(serializers.data)
-
 
 
 # class RequestPasswordResetEmail(generics.GenericAPIView):

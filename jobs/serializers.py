@@ -15,29 +15,37 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class JobSerializer(serializers.ModelSerializer):
     reviews = serializers.SerializerMethodField(read_only=True)
-    category = CategorySerializer(read_only=True)
+    # category = CategorySerializer(read_only=True)
     
     class Meta:
         model = Job
         fields = ['id', 'category', 'name', 'slug', 'country', 'address', 'description', 'image', 'body', 
                 'work_time', 'responsibility', 'job_title', 'salary', 'benefits', 'site', 'email', 'phone',
-                'reviews']
-    
+                'is_active', 'created_at', 'reviews']
+        
     def get_reviews(self,obj):
         reviews = obj.review_set.filter(is_active=True)
-        return ReviewSerializer(reviews, many=True).data  
+        return ReviewSerializer(reviews, many=True).data
 
 
 class CategoryDetailSerializer(serializers.ModelSerializer):
     jobs = JobSerializer(many=True, read_only=True)
+    jobs = serializers.SerializerMethodField(read_only=True)
+    
+    
     class Meta:
         model = Category
-        fields =  ['id', 'name', 'slug', 'jobs'] 
+        fields =  ['id', 'name', 'slug', 'jobs']
+
+    def get_jobs(self,obj):
+        jobs = obj.jobs.filter(is_active=True)
+        return JobSerializer(jobs, many=True).data
 
 
 
 class ApplicationSerializer(serializers.ModelSerializer):
     application = serializers.SerializerMethodField(read_only=True)
+    
     class Meta:
         model = Application
         fields = ['id', 'job', 'user', 'full_name', 'email', 'phone', 'upload_cv', 'coverletter', 
@@ -59,8 +67,3 @@ class ReviewSerializer(serializers.ModelSerializer):
     def get_name(self,obj):
         name = obj.user.first_name
         return name
-
-
-
-
-    

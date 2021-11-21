@@ -1,4 +1,3 @@
-
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -7,54 +6,54 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import generics
 from jobs.models import Category, Job, Application, Review
-from jobs.serializers import CategorySerializer, ApplicationSerializer, ReviewSerializer, JobSerializer, CategoryDetailSerializer
+from jobs.serializers import CategorySerializer, ApplicationSerializer, ReviewSerializer
+from jobs.serializers import JobSerializer, CategoryDetailSerializer
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import get_object_or_404
-
 from rest_framework import mixins
 from rest_framework import generics
 
+class CategoryList(mixins.ListModelMixin,
+                generics.GenericAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+
+class CategoryDetail(mixins.RetrieveModelMixin,
+                    generics.GenericAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategoryDetailSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+# class CategoryDetail(APIView):
+    
+#     def get(self, request, pk):
+#         category = get_object_or_404(Category, pk=pk)
+#         serializers = CategoryDetailSerializer(category)
+#         return Response(serializers.data)
+
 class jobList(mixins.ListModelMixin,
-              generics.GenericAPIView):
-    queryset = Job.objects.all()
+            generics.GenericAPIView):
+    queryset = Job.objects.filter(is_active=True)
     serializer_class = JobSerializer
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
 
+class JobDetail(mixins.RetrieveModelMixin,
+                generics.GenericAPIView):
+    queryset = Job.objects.filter(is_active=True)
+    serializer_class = JobSerializer
 
-class CategoryList(APIView):
-    
-    def get(self, request):
-        category = Category.objects.all()
-        serializers = CategorySerializer(category, many=True)
-        return Response(serializers.data)
-
-
-class CategoryDetail(APIView):
-    
-    def get(self, request, pk):
-        category = get_object_or_404(Category, pk=pk)
-        serializers = CategoryDetailSerializer(category)
-        return Response(serializers.data)
-
-
-class jobAPIView(APIView):
-    
-    def get(self, request):
-        jobs = Job.objects.all()
-        serializers = JobSerializer(jobs, many=True)
-        return Response(serializers.data)
-
-
-class JobDetail(APIView):
-    
-    def get(self, request, pk):
-        job = get_object_or_404(Job, pk=pk)
-        serializers = JobSerializer(job)
-        return Response(serializers.data)
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
 
 @api_view(['POST'])
@@ -69,7 +68,7 @@ def create_job_application(request, pk):
     alreadyExists = job.application_set.filter(user=user).exists()
 
     if alreadyExists:
-        content = {'detail': 'The application has already been sent to the vacancy'}
+        content = {'detail': 'Заявка уже отправлена на вакансию'}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
 #2 CREATE Application
@@ -83,8 +82,8 @@ def create_job_application(request, pk):
             upload_cv=data['upload_cv'],
             coverletter=data['coverletter'],
         )
-        return Response('Application Added')
-
+        serializer = ApplicationSerializer(instance=application)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @api_view(['POST'])
@@ -99,7 +98,7 @@ def create_job_review(request, pk):
     alreadyExists = job.review_set.filter(user=user).exists()
 
     if alreadyExists:
-        content = {'detail': 'Job already Reviewed'}
+        content = {'detail': 'Отзыв уже добавлен!'}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
 #3 CREATE REVIEW
@@ -114,7 +113,6 @@ def create_job_review(request, pk):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-
 # class ReviewViewSet(ModelViewSet):
 #     queryset = Review.objects.all().order_by('-id')
 #     serializer_class = ReviewSerializer
@@ -127,12 +125,6 @@ def create_job_review(request, pk):
 #         review.save()
 #         serializer = self.get_serializer(instance=review)
 #         return Response(serializer.data)
-
-
-
-
-
-
 
 
 

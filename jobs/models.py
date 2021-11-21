@@ -18,9 +18,6 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-    def get_absolute_url(self):
-        return reverse('job_list_by_category', args=[self.slug])
-
 
 class Job(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='jobs', verbose_name='Категория')
@@ -51,9 +48,6 @@ class Job(models.Model):
         
     def __str__(self):
         return self.name
-
-    def get_absolute_url(self):
-        return reverse('job_details', args=[self.id, self.slug])
 
 
 class Application(models.Model):
