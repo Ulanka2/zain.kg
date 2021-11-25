@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django_countries',
     'ckeditor',
     'rest_framework',
-    # 'django_rest_passwordreset',
+    'django_rest_passwordreset',
     'drf_yasg',
     'rest_framework.authtoken',
 

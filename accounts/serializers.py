@@ -2,6 +2,8 @@ from rest_framework import serializers
 from rest_framework import exceptions
 from django.contrib.auth import password_validation 
 from django.contrib.auth import get_user_model
+from rest_framework import serializers
+from django.contrib.auth.models import User
 
 User = get_user_model()
 
@@ -27,6 +29,7 @@ class RegistrationSerializer(serializers.Serializer):
         password_validation.validate_password(value, self.instance)
         return value
 
+
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
@@ -35,14 +38,14 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name']
-    
-    
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'password']
 
-# class ResetPasswordEmailRequestSerializer(serializers.Serializer):
-#     email = serializers.EmailField(min_length=2)
 
-#     redirect_url = serializers.CharField(max_length=500, required=False)
+class ChangePasswordSerializer(serializers.Serializer):
+    model = User
 
-#     class Meta:
-#         fields = ['email']
+    """
+    Serializer for password change endpoint.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)

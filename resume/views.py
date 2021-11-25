@@ -88,6 +88,7 @@ class LanguageAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
+
 class EducationAPIView(APIView):
 
     def post(self, request, id):
@@ -119,7 +120,6 @@ class EducationAPIView(APIView):
             doc.save(doc_name)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class WorkExperienceOneAPIView(APIView):
