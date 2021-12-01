@@ -1,8 +1,5 @@
-*.pyc
-.idea
-env
+env/
 db.sqlite3
-templates
-static
 DS_Store
-__pycache__
+__pycache__/
+media

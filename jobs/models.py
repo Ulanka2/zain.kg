@@ -1,5 +1,4 @@
 from django.db import models
-from django.urls import reverse
 from django_countries.fields import CountryField
 from ckeditor.fields import RichTextField
 from django.contrib.auth import get_user_model
@@ -8,7 +7,6 @@ User = get_user_model()
 
 class Category(models.Model):
     name = models.CharField(max_length=200, verbose_name='Название')
-    slug = models.SlugField(max_length=200, unique=True, db_index=True)
 
     class Meta:
         verbose_name = 'Категория'
@@ -22,7 +20,6 @@ class Category(models.Model):
 class Job(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='jobs', verbose_name='Категория')
     name = models.CharField(max_length=200, verbose_name='Название вакансии')
-    slug = models.SlugField(max_length=200, unique=True)
     country = CountryField(blank_label='(select country)')
     address = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True, verbose_name='Описание')
@@ -44,19 +41,18 @@ class Job(models.Model):
         ordering = ['-created_at']
         verbose_name = 'Вакансия'
         verbose_name_plural = 'Вакансии'
-        index_together = (('id', 'slug'),)
         
     def __str__(self):
         return self.name
 
 
 class Application(models.Model):
-    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='application')
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     full_name = models.CharField(max_length=255)
     email = models.EmailField(null=True, blank=True)
     phone = models.CharField(max_length=55, null=True, blank=True)
-    upload_cv = models.FileField(upload_to='media_rezume')
+    upload_cv = models.FileField(upload_to='media_rezume_apply')
     coverletter = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=False)
@@ -86,9 +82,3 @@ class Review(models.Model):
         
     def __str__(self):
         return f'Отзыв от {self.user}'
-
-
-
-
-
-    

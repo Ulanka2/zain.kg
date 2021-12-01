@@ -1,12 +1,17 @@
 from django.contrib import admin
+from .models import PersonalData, LanguageChoices
 
-from .models import PersonalData, LanguageChoices, Language, Education, WorkExperience, Skills
+class PersonalDataAdmin(admin.ModelAdmin):
+    list_display = ('id', 'full_name', 'position', 'file', 'created_at')
+    list_display_links = ('id', 'full_name', 'position', 'file')
+    search_fields = ('full_name',)
 
-admin.site.register(PersonalData)
-admin.site.register(LanguageChoices)
-admin.site.register(Language)
-admin.site.register(Education)
-admin.site.register(WorkExperience)
-admin.site.register(Skills)
+class LanguageChoicesAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    list_display_links = ('id', 'name')
+
+admin.site.register(PersonalData, PersonalDataAdmin)
+admin.site.register(LanguageChoices, LanguageChoicesAdmin)
+
 
 

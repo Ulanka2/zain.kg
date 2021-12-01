@@ -9,7 +9,7 @@ class CategorySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Category
-        fields =  ['id', 'name', 'slug', 'jobs']
+        fields =  ['id', 'name', 'jobs']
 
 
 
@@ -19,7 +19,7 @@ class JobSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Job
-        fields = ['id', 'category', 'name', 'slug', 'country', 'address', 'description', 'image', 'body', 
+        fields = ['id', 'category', 'name', 'country', 'address', 'description', 'image', 'body', 
                 'work_time', 'responsibility', 'job_title', 'salary', 'benefits', 'site', 'email', 'phone',
                 'is_active', 'created_at', 'reviews']
         
@@ -35,7 +35,7 @@ class CategoryDetailSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Category
-        fields =  ['id', 'name', 'slug', 'jobs']
+        fields =  ['id', 'name', 'jobs']
 
     def get_jobs(self,obj):
         jobs = obj.jobs.filter(is_active=True)
@@ -44,16 +44,12 @@ class CategoryDetailSerializer(serializers.ModelSerializer):
 
 
 class ApplicationSerializer(serializers.ModelSerializer):
-    application = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = Application
         fields = ['id', 'job', 'user', 'full_name', 'email', 'phone', 'upload_cv', 'coverletter', 
-                  'created_at', 'is_active', 'is_watch'] 
-
-    def get_application(self,obj):
-        application = obj.application_set.all()
-        return ApplicationSerializer(application, many=True).data
+                  'created_at', 'is_active', 'is_watch']
+        read_only_fields = ['job',]
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -62,7 +58,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ['id', 'job', 'user', 'name', 'comment', 'created_at', 'is_active']
-        read_only_fields = ['is_active',]
+        read_only_fields = ['job',]
     
     def get_name(self,obj):
         name = obj.user.first_name

@@ -1,15 +1,14 @@
-from os import name
 from django.db import models
 
 
 class PersonalData(models.Model):
     image = models.ImageField(upload_to='image_rezume', null=True, blank=True)
-    position_applied_for = models.CharField(max_length=55)
-    num_passport_expire = models.CharField(max_length=55)
+    position = models.CharField(max_length=55)
+    num_passport = models.CharField(max_length=55)
     full_name = models.CharField(max_length=55)
     nationality_gender = models.CharField(max_length=55)
     country_city_of_residence = models.CharField(max_length=55)
-    date_and_place_of_birth = models.CharField(max_length=55)
+    date_of_birth = models.CharField(max_length=55)
     age_height_weight = models.CharField(max_length=30)
     status_children = models.CharField(max_length=30)
     health_smoker = models.CharField(max_length=30)
@@ -17,6 +16,9 @@ class PersonalData(models.Model):
     file = models.FileField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name_plural = 'Резюме кандидататов'
+        ordering = ['-created_at']
 
 class LanguageChoices(models.Model):
     name = models.CharField(max_length=20)
@@ -44,7 +46,7 @@ class Education(models.Model):
     university = models.CharField(max_length=100)
     specialization = models.CharField(max_length=100)
     duration =  models.CharField(max_length=10)
-    year_of_graduation_city_country = models.CharField(max_length=55)
+    city_country = models.CharField(max_length=55)
    
 
 class WorkExperience(models.Model):
@@ -57,7 +59,7 @@ class WorkExperience(models.Model):
 
 class Skills(models.Model):
     personal_data = models.ForeignKey(PersonalData, on_delete=models.CASCADE)
-    other_professional_achievements_skills = models.TextField()
+    skills = models.TextField()
     
     I_AM_WILLING_TO_WORK = [
         ('Less than 40 hours/week', 'Less than 40 hours/week'),
@@ -66,4 +68,5 @@ class Skills(models.Model):
     ]
     work_time = models.CharField(max_length=30, choices=I_AM_WILLING_TO_WORK)
     
-    i_confirm_that_the_information_of_application_form_is_true = models.CharField(max_length=55)  
+    i_confirm = models.CharField(max_length=55)
+    

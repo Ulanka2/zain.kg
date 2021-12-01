@@ -1,4 +1,3 @@
-from django.core.mail import send_mail
 from rest_framework.views  import  APIView
 from accounts.serializers import RegistrationSerializer, LoginSerializer, UserSerializer
 from django.contrib.auth import get_user_model
@@ -7,7 +6,6 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import  IsAuthenticated
 from django.contrib.auth import authenticate
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework import generics
 from django.contrib.auth.models import User
 from .serializers import ChangePasswordSerializer
@@ -110,3 +108,4 @@ class ChangePasswordView(generics.UpdateAPIView):
             return Response(response)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        

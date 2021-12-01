@@ -6,8 +6,8 @@ class PersonalDataSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = PersonalData
-        fields = ['id', 'image', 'position_applied_for', 'num_passport_expire', 'full_name', 
-                'nationality_gender', 'country_city_of_residence', 'date_and_place_of_birth', 
+        fields = ['id', 'image', 'position', 'num_passport', 'full_name', 
+                'nationality_gender', 'country_city_of_residence', 'date_of_birth', 
         'age_height_weight', 'status_children', 'health_smoker', 'image_full_height', 'file']
     
 
@@ -29,8 +29,7 @@ class EducationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Education
-        fields = ['id', 'personal_data', 'university', 'specialization', 
-                        'duration', 'year_of_graduation_city_country']
+        fields = ['id', 'personal_data', 'university', 'specialization', 'duration', 'city_country']
         read_only_fields = ['personal_data', ]
    
 
@@ -46,6 +45,5 @@ class SkillsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Skills
-        fields = ['id', 'personal_data', 'other_professional_achievements_skills', 'work_time', 
-                                'i_confirm_that_the_information_of_application_form_is_true']
+        fields = ['id', 'personal_data', 'skills', 'work_time', 'i_confirm']
         read_only_fields = ['personal_data', ]

@@ -12,6 +12,7 @@ class User(AbstractUser):
         STAFF = 'staff'
         BASE_USER = 'base_user'
     user_type = models.CharField(max_length=50, choices=UserType.choices, default=UserType.BASE_USER)
+    image = models.ImageField(upload_to='image_users', null=True, blank=True)
 
 
 @receiver(reset_password_token_created)
