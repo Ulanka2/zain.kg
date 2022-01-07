@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <!-- slider_area_start -->
+    <div class="slider_area">
+        <div class="single_slider  d-flex align-items-center slider_bg_1">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-7 col-md-6">
+                        <div class="slider_text">
+                            <h5 class="wow fadeInLeft" data-wow-duration="1s" data-wow-delay=".2s">Работа за рубежом, Work and Travel, работа в Дубае (ОАЭ)</h5>
+                            <h3 class="wow fadeInLeft" data-wow-duration="1s" data-wow-delay=".3s">Агентство по трудоустройству</h3>
+                            <p class="wow fadeInLeft" data-wow-duration="1s" data-wow-delay=".5s">Для того, чтобы мы занесли вашу кандидатуру в базу данных нашего агентства, необходимо заполнить анкету (Application Form) и выслать ее нам по WhatsApp +996 770 909 090. Обратите внимание на необходимость приложения двух фотографий — 3Х4 и в полный рост.</p>
+                            <div class="sldier_btn wow fadeInLeft" data-wow-duration="1s" data-wow-delay=".6s">
+                                <a href="{% static 'resume.docx' %}" class="boxed-btn3">Скачать Application Form</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- slider_area_end -->
+    
+    <center>
+    <h1>ВАКАНСИИ</h1>
+    <div class="card" style="width: 25rem;">
+    {% for j in jobs %}
+    {% if j.image %}
+	<p><img  class="card-img-top" src="{{j.image.url}}"></p>
+    <div class="card-body">
+        <h5 class="card-title">{{j.name}}</h5>
+        <p class="card-text">{{j.description}}</p>
+        <p class="last">Дата: {{j.created_at|date:"d-m-Y H:i:s"}}</p>
+        <a href="{% url 'job_details' pk=j.pk %}" class="btn btn-primary">Оставить заявку</a>
+    </div> 
+    {% endif %}
+    {% endfor %}
+    <p>{% include "pagination.html"  with page=jobs %}</p>
+    </div> 
+    </center>
+
+    <div class="top_companies_area">
+        <div class="container">
+            <div class="row align-items-center mb-40">
+                <div class="col-lg-6 col-md-6">
+                    <div class="section_title">
+                        <h3>Top Companies</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-xl-3 col-md-6">
+                    <div class="single_company">
+                        <div class="#">
+                            <img src="" alt="">
+                        </div>
+                        <a href="https://jobs.fourseasons.com"><h3>Four Seasons</h3></a>
+                        <p> <span></span> Available position</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-xl-3 col-md-6">
+                    <div class="single_company">
+                        <div class="#">
+                            <img src="#" alt="">
+                        </div>
+                        <a href="https://careers.coolinc.com.sa"><h3>COOL INC</h3></a>
+                        <p> <span></span> Available position</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-xl-3 col-md-6">
+                    <div class="single_company">
+                        <div class="">
+                            <img src="#" alt="">
+                        </div>
+                        <a href="https://www.emiratesgroupcareers.com"><h3>Emirates</h3></a>
+                        <p> <span></span> Available position</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-xl-3 col-md-6">
+                    <div class="single_company">
+                        <div class="">
+                            <img src="" alt="">
+                        </div>
+                        <a href="https://careers.accor.com/global/en/raffles-jobs?utm_medium=accor_brands_websites&utm_source=raffles&utm_campaign=raffles"><h3>RAFFLES</h3></a>
+                        <p> <span></span> Available position</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

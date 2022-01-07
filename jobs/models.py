@@ -1,9 +1,6 @@
 from django.db import models
-from django_countries.fields import CountryField
 from ckeditor.fields import RichTextField
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
+from django.urls import reverse
 
 class Category(models.Model):
     name = models.CharField(max_length=200, verbose_name='Название')
@@ -17,22 +14,18 @@ class Category(models.Model):
         return self.name
 
 
+
 class Job(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='jobs', verbose_name='Категория')
     name = models.CharField(max_length=200, verbose_name='Название вакансии')
-    country = CountryField(blank_label='(select country)')
-    address = models.CharField(max_length=255, null=True, blank=True)
+    country = models.CharField(max_length=100, verbose_name='Страна', null=True, blank=True)
     description = models.TextField(null=True, blank=True, verbose_name='Описание')
-    image = models.ImageField(upload_to='media_job', null=True, blank=True, verbose_name='Изображение')
+    image = models.ImageField(upload_to="jobs_image/%Y/%m/%d/", null=True, blank=True, verbose_name='Изображение')
     body =  RichTextField(null=True, blank=True)
     work_time = models.CharField(max_length=55, null=True, blank=True)
     responsibility = models.TextField(null=True, blank=True, verbose_name='Обязанность')
-    job_title = models.CharField(max_length=55, null=True, blank=True, verbose_name='Должность')
     salary = models.CharField(max_length=55, null=True, blank=True)
     benefits = models.TextField(null=True, blank=True)
-    site = models.URLField(null=True, blank=True, verbose_name='Сайт компании')
-    email = models.EmailField(null=True, blank=True)
-    phone = models.CharField(max_length=55, null=True, blank=True)
     is_active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -45,40 +38,3 @@ class Job(models.Model):
     def __str__(self):
         return self.name
 
-
-class Application(models.Model):
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='application')
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    full_name = models.CharField(max_length=255)
-    email = models.EmailField(null=True, blank=True)
-    phone = models.CharField(max_length=55, null=True, blank=True)
-    upload_cv = models.FileField(upload_to='media_rezume_apply')
-    coverletter = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(default=False)
-    is_watch = models.BooleanField(default=False)
-
-    class Meta:
-        verbose_name = 'Заявка на вакансию'
-        verbose_name_plural = 'Заявки на вакансию'
-        ordering = ['-created_at']
-        
-    def __str__(self):
-        return f'Заявка от {self.user}, {self.full_name}'
-
-
-class Review(models.Model):
-    job = models.ForeignKey(Job, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    name = models.CharField(max_length=255, null=True, blank=True)
-    comment = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(default=False)
-
-    class Meta:
-        verbose_name = 'Отзыв'
-        verbose_name_plural = 'Отзывы от кандидатов'
-        ordering = ['-created_at']
-        
-    def __str__(self):
-        return f'Отзыв от {self.user}'

@@ -1,4 +1,4 @@
-#!/Users/a1/Desktop/zain.kg/env/bin/python3
+#!/Users/a1/Desktop/zain.kg2/env/bin/python3
 # When the django-admin.py deprecation ends, remove this script.
 import warnings
 
